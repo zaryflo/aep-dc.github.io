@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebMD - Alloy SDK Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #0066cc;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .info {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebMD - Adobe Experience Platform Alloy SDK Test</h1>
+        
+        <div class="section">
+            <h3>Configuration</h3>
+            <p class="info"><strong>Datastream ID:</strong> <span id="config-datastream"></span></p>
+            <p class="info"><strong>Organization ID:</strong> <span id="config-orgid"></span></p>
+            <p class="info"><strong>Edge Domain:</strong> <span id="config-edge-domain"></span></p>
+            <p class="info"><strong>Edge Base Path:</strong> <span id="config-edge-path"></span></p>
+            <p class="info"><strong>Default Consent:</strong> <span id="config-consent"></span></p>
+            <p class="info"><strong>Debug Enabled:</strong> <span id="config-debug"></span></p>
+            <p class="info"><strong>Alloy Version:</strong> 2.30.0 (via CDN)</p>
+        </div>
+
+        <div class="section">
+            <h3>Actions</h3>
+            <button onclick="sendPageViewEvent()">Send Page View Event</button>
+            <button onclick="getECID()">Get ECID</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+
+        <div class="section">
+            <h3>Response Output</h3>
+            <div id="output">Waiting for actions...</div>
+        </div>
+    </div>
+
+    <script>
+        // Alloy configuration object
+        const alloyConfig = {
+            datastreamId: "b685d0b1-00e4-41ae-8acd-dcedd2bed9e8",
+            orgId: "53A16ACB5CC1D3760A495C99@AdobeOrg",
+            edgeDomain: "edge.adobedc.net",
+            edgeBasePath: "ee",
+            defaultConsent: "in",
+            debugEnabled: true,
+            context: ["web", "device", "environment", "placeContext"],
+            thirdPartyCookiesEnabled: true
+        }
+
+        // Create the alloy queue before the SDK loads
+        !function(n,o){o.forEach(function(o){n[o]||((n.__alloyNS=n.__alloyNS||[]).push(o),n[o]=function(){var u=arguments;return new Promise(function(i,l){n[o].q.push([i,l,u])})},n[o].q=[])})}(window,["alloy"]);
+
+        // Display configuration values in the UI
+        function displayConfiguration() {
+            const elements = {
+                'config-datastream': alloyConfig.datastreamId,
+                'config-orgid': alloyConfig.orgId,
+                'config-edge-domain': alloyConfig.edgeDomain,
+                'config-edge-path': alloyConfig.edgeBasePath,
+                'config-consent': alloyConfig.defaultConsent,
+                'config-debug': alloyConfig.debugEnabled ? 'Yes' : 'No'
+            };
+            
+            Object.keys(elements).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = elements[id];
+                }
+            });
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded, displaying configuration...', 'info');
+            displayConfiguration();
+            
+            log('Configuring Alloy SDK...', 'info');
+            
+            // Configure Alloy (this will work even before SDK loads due to queue)
+            alloy("configure", alloyConfig)
+                .then(() => {
+                    log('✓ Alloy SDK configured successfully!', 'success');
+                })
+                .catch((error) => {
+                    log('✗ Error configuring Alloy: ' + error.message, 'error');
+                    console.error('Alloy configuration error:', error);
+                });
+        });
+
+        // Utility function for logging
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toISOString();
+            const prefix = type === 'success' ? '✓' : type === 'error' ? '✗' : '→';
+            const colorClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            
+            const line = `[${timestamp}] ${prefix} ${message}\n`;
+            output.innerHTML += line;
+            output.scrollTop = output.scrollHeight;
+            
+            console.log(message);
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = 'Output cleared.\n';
+        }
+
+        // Generate a unique visitor ID (simulating FPID)
+        function generateFPID() {
+            let visitorId = localStorage.getItem('webmd_visitor_id');
+            if (!visitorId) {
+                visitorId = generateUUID();
+                localStorage.setItem('webmd_visitor_id', visitorId);
+            }
+            return visitorId;
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Get ECID
+        async function getECID() {
+            log('Fetching ECID...', 'info');
+            try {
+                const result = await alloy("getIdentity",{
+                    "namespaces": ["ECID","CORE"]
+                });
+                log('ECID and CORE IDs retrieved successfully:', 'success');
+                log(JSON.stringify(result, null, 2), 'info');
+            } catch (error) {
+                log('Error fetching ECID and CORE IDs: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        // Send Page View Event (similar to the curl request)
+        async function sendPageViewEvent() {
+            log('Sending Page View event...', 'info');
+            
+            const visitorId = generateFPID();
+            
+            try {
+                const result = await alloy("sendEvent", {
+                    type: "web.webpagedetails.pageViews",
+                    xdm: {
+                        web: {
+                            webPageDetails: {
+                                URL: window.location.href,
+                                pageViews: {
+                                    value: 1
+                                },
+                                server: "test",
+                                name: "webmd"
+                            },
+                            webReferrer: {
+                                URL: document.referrer || window.location.href
+                            }
+                        },
+                        device: {
+                            screenHeight: window.screen.height,
+                            screenWidth: window.screen.width,
+                            screenOrientation: window.screen.orientation?.type || "landscape"
+                        },
+                        environment: {
+                            type: "browser",
+                            browserDetails: {
+                                viewportWidth: window.innerWidth,
+                                viewportHeight: window.innerHeight
+                            }
+                        },
+                        placeContext: {
+                            localTimezoneOffset: new Date().getTimezoneOffset(),
+                            localTime: new Date().toISOString()
+                        },
+                        timestamp: new Date().toISOString(),
+                        implementationDetails: {
+                            name: "https://ns.adobe.com/experience/alloy",
+                            version: "2.30.0",
+                            environment: "browser"
+                        },
+                        identityMap: {
+                            FPID: [{
+                                authenticatedState: "ambiguous",
+                                id: visitorId,
+                                primary: true
+                            }]
+                        }
+                    }
+                });
+
+                log('✓ Page View event sent successfully!', 'success');
+                log('Response:', 'info');
+                log(JSON.stringify(result, null, 2), 'info');
+            } catch (error) {
+                log('✗ Error sending event: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        // Log when page loads
+        window.addEventListener('load', () => {
+            log('Page fully loaded', 'info');
+            log(`Visitor ID: ${generateFPID()}`, 'info');
+        });
+    </script>
+
+    <!-- Load Alloy SDK from CDN (after queue is set up) -->
+    <script src="https://cdn1.adoberesources.net/alloy/2.30.0/alloy.min.js" 
+            onerror="console.error('Failed to load Alloy SDK from CDN'); document.getElementById('output').innerHTML += '[ERROR] Failed to load Alloy SDK from CDN. Check network connection.\n';">
+    </script>
+</body>
+</html>
+
