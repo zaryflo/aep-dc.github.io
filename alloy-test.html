@@ -260,8 +260,6 @@
                 });
 
                 log('✓ Page View event sent successfully!', 'success');
-                log('Response:', 'info');
-                log(JSON.stringify(result, null, 2), 'info');
             } catch (error) {
                 log('✗ Error sending event: ' + error.message, 'error');
                 console.error(error);
