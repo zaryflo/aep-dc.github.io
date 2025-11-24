@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebMD - Alloy SDK Test</title>
+    <title>Alloy SDK Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,7 +75,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>WebMD - Adobe Experience Platform Alloy SDK Test</h1>
+        <h1>Adobe Experience Platform Alloy SDK Test</h1>
         
         <div class="section">
             <h3>Configuration</h3>
@@ -209,7 +209,7 @@
         async function sendPageViewEvent() {
             log('Sending Page View event...', 'info');
             
-            const visitorId = generateFPID();
+            const fpid = generateFPID();
             
             try {
                 const result = await alloy("sendEvent", {
@@ -253,7 +253,7 @@
                         identityMap: {
                             FPID: [{
                                 authenticatedState: "ambiguous",
-                                id: visitorId,
+                                id: fpid,
                                 primary: true
                             }]
                         }
