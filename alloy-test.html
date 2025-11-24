@@ -174,11 +174,7 @@
 
         // Generate a unique visitor ID (simulating FPID)
         function generateFPID() {
-            let visitorId = localStorage.getItem('webmd_visitor_id');
-            if (!visitorId) {
-                visitorId = generateUUID();
-                localStorage.setItem('webmd_visitor_id', visitorId);
-            }
+            visitorId = generateUUID();
             return visitorId;
         }
 
