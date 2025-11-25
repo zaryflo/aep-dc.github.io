@@ -208,7 +208,7 @@
         async function sendPageViewEvent() {
             log('Sending Page View event...', 'info');
             
-            //const fpid = generateFPID();
+            const fpid = generateFPID();
             
             try {
                 const result = await alloy("sendEvent", {
@@ -248,6 +248,13 @@
                             name: "https://ns.adobe.com/experience/alloy",
                             version: "2.30.0",
                             environment: "browser"
+                        },
+                        identityMap: {
+                            FPID: [{
+                                authenticatedState: "ambiguous",
+                                id: fpid,
+                                primary: true
+                            }]
                         }
                     }
                 });
