@@ -90,7 +90,7 @@
 
         <div class="section">
             <h3>Actions</h3>
-            <button onclick="sendPageViewEvent()">Send Page View Event</button>
+            <button onclick="sendPageViewEvent()">Send Test Event</button>
             <button onclick="getECID()">Get ECID</button>
             <button onclick="clearOutput()">Clear Output</button>
         </div>
@@ -104,7 +104,7 @@
     <script>
         // Alloy configuration object
         const alloyConfig = {
-            datastreamId: "5562c47a-72f3-48f5-96eb-040227b37ac8",
+            datastreamId: "71de1896-7c13-4a71-9014-cf0a6b367a9b",
             orgId: "53A16ACB5CC1D3760A495C99@AdobeOrg",
             edgeDomain: "edge.adobedc.net",
             edgeBasePath: "ee",
@@ -212,7 +212,7 @@
             
             try {
                 const result = await alloy("sendEvent", {
-                    type: "web.webpagedetails.pageViews",
+                    type: "test-event",
                     xdm: {
                         web: {
                             webPageDetails: {
@@ -221,7 +221,7 @@
                                     value: 1
                                 },
                                 server: "test",
-                                name: "webmd"
+                                name: "test"
                             },
                             webReferrer: {
                                 URL: document.referrer || window.location.href
@@ -248,18 +248,11 @@
                             name: "https://ns.adobe.com/experience/alloy",
                             version: "2.30.0",
                             environment: "browser"
-                        },
-                        identityMap: {
-                            FPID: [{
-                                authenticatedState: "ambiguous",
-                                id: fpid,
-                                primary: true
-                            }]
                         }
                     }
                 });
 
-                log('✓ Page View event sent successfully!', 'success');
+                log('✓ Test event sent successfully!', 'success');
             } catch (error) {
                 log('✗ Error sending event: ' + error.message, 'error');
                 console.error(error);
